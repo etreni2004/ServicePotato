@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智誠志工整合平台 - 期末報告互動展示</title>
+    
+    <!-- Tailwind CSS (樣式庫) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js (圖表庫) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome (圖示庫) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts (字體) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+
+    <!-- Configuration & Custom Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF8E72', // 溫暖珊瑚橘
+                        secondary: '#6C9A8B', // 鼠尾草綠
+                        dark: '#2D3047',
+                        light: '#FFF6E5',
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                        gemini: '#8E24AA'
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                        heading: ['Nunito', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #FFF6E5 0%, #FFEFD5 50%, #E0F7FA 100%);
+            min-height: 100vh;
+            overflow-x: hidden; /* 防止水平滾動 */
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; 
+            margin: 0 auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF8E72; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e07d63; 
+        }
+
+        /* Animations */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        .animate-sos {
+            animation: pulse-red 2s infinite;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* 圖片容器樣式 */
+        .img-frame {
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 4px solid white;
+        }
+        .img-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .img-frame:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="text-dark antialiased selection:bg-primary selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-panel px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                <i class="fa-solid fa-seedling"></i>
+            </div>
+            <span class="font-heading font-bold text-xl tracking-tight hidden sm:block">智誠志工整合平台</span>
+        </div>
+        <div class="flex gap-4 text-sm font-medium">
+            <a href="#pain-points" class="hover:text-primary transition py-2">痛點分析</a>
+            <a href="#journey-sim" class="hover:text-primary transition py-2">互動旅程</a>
+            <a href="#gemini-ai" class="hover:text-primary transition py-2">AI 賦能</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-10">
+        <div class="md:w-1/2 text-left animate-fade">
+            <span class="inline-block py-1 px-3 rounded-full bg-orange-100 text-orange-600 text-sm font-bold mb-6">
+                <i class="fa-solid fa-shield-heart mr-2"></i>期末提案：服務優化
+            </span>
+            <h1 class="font-heading text-5xl lg:text-6xl font-extrabold mb-6 text-dark leading-tight">
+                照顧好志工，<br>讓善意像<span class="text-primary">漣漪</span>一樣擴散
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                全台首創「全流程守護」的志工互助生態系。從透明預備、即時互助到心理修復，我們用科技接住每一顆熱忱的心。
+            </p>
+            <div class="flex gap-4">
+                <a href="#journey-sim" class="bg-primary hover:bg-orange-500 text-white px-8 py-3 rounded-full font-bold shadow-lg transition transform hover:-translate-y-1">
+                    體驗志工旅程
+                </a>
+                <button onclick="document.getElementById('pain-points').scrollIntoView({behavior: 'smooth'})" class="bg-white hover:bg-gray-50 text-dark border border-gray-200 px-8 py-3 rounded-full font-bold shadow-sm transition">
+                    了解問題
+                </button>
+            </div>
+        </div>
+        <div class="md:w-1/2 relative">
+            <div class="img-frame rotate-2 hover:rotate-0 transition duration-500 h-[400px]">
+                <!-- 使用 Unsplash 圖片：快樂的志工 -->
+                <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?q=80&w=2074&auto=format&fit=crop" alt="Happy Volunteers High Five">
+            </div>
+            <div class="absolute -bottom-5 -left-5 glass-panel p-4 rounded-xl shadow-lg flex items-center gap-3 animate-bounce">
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 font-bold">志工滿意度</p>
+                    <p class="font-bold text-dark">提升 40%</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pain Points Section -->
+    <section id="pain-points" class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="font-heading text-3xl font-bold mb-4">為什麼善意會受傷？</h2>
+            <p class="text-gray-600">我們觀察到的四大核心痛點，阻礙了志工服務的永續發展。</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Pain Card 1 -->
+            <div class="glass-panel p-6 rounded-2xl border-t-4 border-primary hover:shadow-xl transition duration-300">
+                <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-4 text-xl">
+                    <i class="fa-solid fa-eye-slash"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">招募不透明</h3>
+                <p class="text-sm text-gray-500">想像與現實落差巨大，面對突發狀況（如攻擊性）毫無心理準備。</p>
+            </div>
+
+            <!-- Pain Card 2 -->
+            <div class="glass-panel p-6 rounded-2xl border-t-4 border-primary hover:shadow-xl transition duration-300">
+                <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 mb-4 text-xl">
+                    <i class="fa-solid fa-person-falling-burst"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">現場孤立無援</h3>
+                <p class="text-sm text-gray-500">發生衝突或被誤解時，現場缺乏即時保護機制，只能獨自承受。</p>
+            </div>
+
+            <!-- Pain Card 3 -->
+            <div class="glass-panel p-6 rounded-2xl border-t-4 border-primary hover:shadow-xl transition duration-300">
+                <div class="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 mb-4 text-xl">
+                    <i class="fa-solid fa-user-nurse"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">助人者被忽略</h3>
+                <p class="text-sm text-gray-500">社會預設志工是強者，忽略了他們也是會受傷、需要被照顧的普通人。</p>
+            </div>
+
+            <!-- Pain Card 4 -->
+            <div class="glass-panel p-6 rounded-2xl border-t-4 border-primary hover:shadow-xl transition duration-300">
+                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mb-4 text-xl">
+                    <i class="fa-solid fa-link-slash"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">經驗傳承斷層</h3>
+                <p class="text-sm text-gray-500">挫折讓人離開，美好經驗沒被記錄。惡性循環導致新人不敢加入。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Journey Simulator (The Core) -->
+    <section id="journey-sim" class="py-10 px-6 max-w-6xl mx-auto">
+        <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl">
+            <!-- Header -->
+            <div class="bg-dark text-white p-8 text-center">
+                <h2 class="font-heading text-3xl font-bold mb-2">互動式體驗：丈艾的志工旅程</h2>
+                <p class="text-gray-300">請切換不同階段，體驗我們如何用科技守護志工。</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 bg-white overflow-x-auto">
+                <button onclick="switchTab('pre')" id="tab-pre" class="flex-1 min-w-[120px] py-4 font-bold text-primary border-b-4 border-primary bg-orange-50 transition-all focus:outline-none whitespace-nowrap">
+                    <i class="fa-solid fa-house-chimney mr-2"></i>前期：透明預備
+                </button>
+                <button onclick="switchTab('during')" id="tab-during" class="flex-1 min-w-[120px] py-4 font-bold text-gray-500 hover:text-secondary hover:bg-gray-50 transition-all focus:outline-none whitespace-nowrap">
+                    <i class="fa-solid fa-hands-holding-circle mr-2"></i>中期：即時互助
+                </button>
+                <button onclick="switchTab('post')" id="tab-post" class="flex-1 min-w-[120px] py-4 font-bold text-gray-500 hover:text-blue-500 hover:bg-gray-50 transition-all focus:outline-none whitespace-nowrap">
+                    <i class="fa-solid fa-heart-pulse mr-2"></i>後期：修復擴散
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-8 bg-white min-h-[500px]">
+                
+                <!-- PRE-SERVICE CONTENT -->
+                <div id="content-pre" class="grid lg:grid-cols-2 gap-10 items-center animate-fade">
+                    <div>
+                        <span class="text-sm font-bold text-primary tracking-wider uppercase mb-2 block">Pre-Service</span>
+                        <h3 class="text-2xl font-bold mb-4 text-dark">打破美好濾鏡，看見真實需求</h3>
+                        <p class="text-gray-600 mb-6">
+                            我們不只列出時間地點，更透過 **Persona Cards** 與 **特質雷達圖**，讓志工「預見」服務對象的樣貌，找到最適合自己的戰場。
+                        </p>
+                        
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                            <h4 class="font-bold mb-3"><i class="fa-solid fa-users-viewfinder text-primary mr-2"></i>選擇服務對象預覽：</h4>
+                            <div class="flex gap-3">
+                                <button onclick="updateRadar('grandpa')" id="btn-grandpa" class="flex-1 py-2 px-4 rounded-lg bg-dark text-white shadow-md transition transform scale-105 text-sm md:text-base">
+                                    👴 75歲失智爺爺
+                                </button>
+                                <button onclick="updateRadar('kid')" id="btn-kid" class="flex-1 py-2 px-4 rounded-lg bg-white text-dark border border-gray-300 hover:bg-gray-100 transition text-sm md:text-base">
+                                    👦 8歲過動男童
+                                </button>
+                            </div>
+                            <div id="persona-desc" class="mt-4 text-sm text-gray-600 p-3 bg-white rounded-lg border border-gray-200">
+                                <strong>情境描述：</strong> 重聽、行動緩慢，偶爾會因為找不到東西而焦慮生氣。<br>
+                                <span class="text-primary font-bold mt-1 block">Gemini 模擬對練重點：學習安撫情緒的語氣。</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center">
+                        <h4 class="font-bold text-gray-500 mb-2 text-sm">所需志工特質分析</h4>
+                        <div class="chart-container">
+                            <canvas id="traitRadarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DURING-SERVICE CONTENT -->
+                <div id="content-during" class="hidden grid lg:grid-cols-2 gap-10 items-start">
+                    <div>
+                        <span class="text-sm font-bold text-secondary tracking-wider uppercase mb-2 block">During-Service</span>
+                        <h3 class="text-2xl font-bold mb-4 text-dark">即時救援，不再孤軍奮戰</h3>
+                        <p class="text-gray-600 mb-6">
+                            遇到衝突不敢打電話？按下 SOS，系統自動錄音並透過 **Gemini API** 生成摘要傳送給 Mentor，讓支援 0 秒差。
+                        </p>
+                        
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+                            <h4 class="font-bold text-red-600 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>情境模擬：衝突發生</h4>
+                            <p class="text-sm text-gray-600 mb-4">現在你正服務一位長輩，但他突然情緒失控指責你偷了他的錢包...</p>
+                            <button id="sos-btn" onclick="triggerSOS()" class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg shadow-lg transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-bell"></i> 觸發 SOS 緊急求救
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat UI Simulator -->
+                    <div class="bg-gray-100 p-4 rounded-2xl shadow-inner h-[400px] flex flex-col relative overflow-hidden">
+                        <div class="bg-white p-3 rounded-t-xl shadow-sm flex justify-between items-center z-10">
+                            <span class="font-bold text-dark"><i class="fa-solid fa-user-group text-secondary mr-2"></i>當日互助小隊 (5人)</span>
+                            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">連線中</span>
+                        </div>
+                        
+                        <div id="chat-window" class="flex-1 overflow-y-auto p-4 space-y-3">
+                            <!-- Existing messages -->
+                            <div class="flex gap-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-xs font-bold text-blue-800">小林</div>
+                                <div class="bg-white p-2 rounded-lg text-sm shadow-sm max-w-[80%]">我這邊的阿嬤心情很好，在唱歌 XD</div>
+                            </div>
+                            <div class="flex gap-2 justify-end">
+                                <div class="bg-primary text-white p-2 rounded-lg text-sm shadow-sm max-w-[80%]">我這裡有點狀況...阿公好像不太認得我。</div>
+                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-white">丈艾</div>
+                            </div>
+                        </div>
+
+                        <!-- SOS Overlay (Hidden by default) -->
+                        <div id="sos-overlay" class="absolute inset-0 bg-red-500/10 backdrop-blur-sm hidden flex-col items-center justify-center z-20">
+                            <div class="bg-white p-4 rounded-xl shadow-2xl w-4/5 max-w-sm border-l-4 border-red-500 animate-fade">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded animate-pulse">SOS 訊號</span>
+                                    <span class="text-xs text-gray-400">剛剛</span>
+                                </div>
+                                <p class="text-sm font-bold text-dark mb-2">來自：丈艾 (A區-203房)</p>
+                                <div class="bg-gray-50 p-2 rounded text-xs text-gray-600 mb-2 border border-gray-200">
+                                    <span class="text-purple-600 font-bold"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Gemini 語音摘要：</span><br>
+                                    偵測到高分貝爭執。服務對象情緒激動，指責志工偷竊。志工語氣驚慌，請求支援。
+                                </div>
+                                <button class="w-full bg-dark text-white text-xs py-2 rounded hover:bg-gray-800">
+                                    Mentor 正在前往中...
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POST-SERVICE CONTENT -->
+                <div id="content-post" class="hidden grid lg:grid-cols-2 gap-10 items-center">
+                    <div>
+                        <span class="text-sm font-bold text-blue-500 tracking-wider uppercase mb-2 block">Post-Service</span>
+                        <h3 class="text-2xl font-bold mb-4 text-dark">情緒儀式：修復與擴散</h3>
+                        <p class="text-gray-600 mb-6">
+                            活動結束不是終點。我們透過 **情緒氣象台** 進行分流：受傷的心進入樹洞修復；感動的心透過 **魔法故事家** 擴散出去。
+                        </p>
+                        
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
+                            <h4 class="font-bold text-dark mb-4">今天服務的感覺如何？</h4>
+                            <div class="flex justify-center gap-6">
+                                <button onclick="showPostResult('rain')" class="flex flex-col items-center gap-2 group">
+                                    <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-3xl group-hover:scale-110 transition text-gray-400 group-hover:text-blue-500">
+                                        <i class="fa-solid fa-cloud-rain"></i>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-500 group-hover:text-blue-500">有點受傷</span>
+                                </button>
+                                <button onclick="showPostResult('sun')" class="flex flex-col items-center gap-2 group">
+                                    <div class="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center text-3xl group-hover:scale-110 transition text-yellow-400 group-hover:text-orange-500">
+                                        <i class="fa-solid fa-sun"></i>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-500 group-hover:text-orange-500">充滿感動</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="post-result-container" class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 min-h-[350px] flex items-center justify-center overflow-hidden relative">
+                        <!-- Default state -->
+                        <div class="text-center" id="post-placeholder">
+                            <p class="text-gray-400 italic">點擊左側天氣圖示<br>查看對應的系統回饋</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Power Explanation -->
+    <section id="gemini-ai" class="py-16 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <span class="text-purple-600 font-bold tracking-wider text-sm uppercase">Powered by Google</span>
+            <h2 class="font-heading text-3xl font-bold mt-2">Gemini API 技術核心</h2>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-purple-200 transition transform hover:-translate-y-2">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mb-4 text-xl">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">動態角色扮演</h3>
+                <p class="text-sm text-gray-600">利用 Gemini 的多輪對話能力，即時扮演不同性格的長輩或孩童，提供無腳本的真實壓力測試。</p>
+            </div>
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-purple-200 transition transform hover:-translate-y-2">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mb-4 text-xl">
+                    <i class="fa-solid fa-file-audio"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">智慧語音摘要</h3>
+                <p class="text-sm text-gray-600">結合語音轉文字與語意分析，在數秒內將現場混亂的錄音轉化為結構化的狀況報告。</p>
+            </div>
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:border-purple-200 transition transform hover:-translate-y-2">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mb-4 text-xl">
+                    <i class="fa-solid fa-pen-nib"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">魔法故事生成</h3>
+                <p class="text-sm text-gray-600">透過少樣本學習 (Few-shot Learning)，將零碎的關鍵字擴寫成溫暖動人的社群貼文。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12 text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="font-heading text-2xl font-bold mb-6">讓善意永續，從這裡開始。</h2>
+            <p class="text-gray-400 mb-8">智誠志工整合平台 - 服務設計期末報告</p>
+            <div class="flex justify-center gap-4 text-2xl">
+                <a href="#" class="hover:text-primary transition"><i class="fa-brands fa-github"></i></a>
+                <a href="#" class="hover:text-primary transition"><i class="fa-brands fa-figma"></i></a>
+                <a href="#" class="hover:text-primary transition"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // --- 1. Radar Chart Setup ---
+        let radarChart;
+        
+        const personaData = {
+            grandpa: {
+                label: '照顧失智爺爺所需特質',
+                data: [90, 85, 30, 40, 70], // Patience, Empathy, Physical, Energy, Resilience
+                color: 'rgba(255, 142, 114, 0.5)',
+                desc: '<strong>情境描述：</strong> 重聽、行動緩慢，偶爾會因為找不到東西而焦慮生氣。<br><span class="text-primary font-bold mt-1 block">Gemini 模擬對練重點：學習安撫情緒的語氣。</span>'
+            },
+            kid: {
+                label: '照顧過動男童所需特質',
+                data: [40, 50, 90, 95, 60], // Patience, Empathy, Physical, Energy, Resilience
+                color: 'rgba(108, 154, 139, 0.5)',
+                desc: '<strong>情境描述：</strong> 精力旺盛、跑跳不停，容易因碰撞發生危險。<br><span class="text-primary font-bold mt-1 block">Gemini 模擬對練重點：學習用遊戲引導專注力。</span>'
+            }
+        };
+
+        function initChart() {
+            const canvas = document.getElementById('traitRadarChart');
+            if(!canvas) return; // Guard clause
+
+            const ctx = canvas.getContext('2d');
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['耐心', '同理心', '體力消耗', '能量輸出', '心理韌性'],
+                    datasets: [{
+                        label: personaData.grandpa.label,
+                        data: personaData.grandpa.data,
+                        backgroundColor: personaData.grandpa.color,
+                        borderColor: '#FF8E72',
+                        pointBackgroundColor: '#FF8E72',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#FF8E72'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { display: false },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false } // Hide numbers for cleaner look
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function updateRadar(type) {
+            if(!radarChart) return;
+            
+            const data = personaData[type];
+            radarChart.data.datasets[0].data = data.data;
+            radarChart.data.datasets[0].label = data.label;
+            radarChart.data.datasets[0].backgroundColor = data.color;
+            radarChart.data.datasets[0].borderColor = type === 'grandpa' ? '#FF8E72' : '#6C9A8B';
+            radarChart.update();
+
+            // Update UI buttons styling
+            if(type === 'grandpa') {
+                document.getElementById('btn-grandpa').className = 'flex-1 py-2 px-4 rounded-lg bg-dark text-white shadow-md transition transform scale-105 text-sm md:text-base';
+                document.getElementById('btn-kid').className = 'flex-1 py-2 px-4 rounded-lg bg-white text-dark border border-gray-300 hover:bg-gray-100 transition text-sm md:text-base';
+            } else {
+                document.getElementById('btn-kid').className = 'flex-1 py-2 px-4 rounded-lg bg-secondary text-white shadow-md transition transform scale-105 text-sm md:text-base';
+                document.getElementById('btn-grandpa').className = 'flex-1 py-2 px-4 rounded-lg bg-white text-dark border border-gray-300 hover:bg-gray-100 transition text-sm md:text-base';
+            }
+
+            // Update description
+            document.getElementById('persona-desc').innerHTML = data.desc;
+        }
+
+
+        // --- 2. Tab Logic ---
+        function switchTab(tabId) {
+            // Hide all content
+            ['pre', 'during', 'post'].forEach(id => {
+                const el = document.getElementById(`content-${id}`);
+                if(el) el.classList.add('hidden');
+                
+                // Reset tab styles
+                const tabBtn = document.getElementById(`tab-${id}`);
+                if(tabBtn) tabBtn.className = 'flex-1 min-w-[120px] py-4 font-bold text-gray-500 hover:bg-gray-50 transition-all focus:outline-none whitespace-nowrap';
+            });
+
+            // Show selected content
+            const activeContent = document.getElementById(`content-${tabId}`);
+            if(activeContent) {
+                activeContent.classList.remove('hidden');
+                activeContent.classList.add('animate-fade'); // Re-trigger fade
+            }
+
+            // Active Tab Style
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            let activeColorClass = 'text-primary border-primary bg-orange-50';
+            if(tabId === 'during') activeColorClass = 'text-secondary border-secondary bg-green-50';
+            if(tabId === 'post') activeColorClass = 'text-blue-500 border-blue-500 bg-blue-50';
+            
+            if(activeBtn) activeBtn.className = `flex-1 min-w-[120px] py-4 font-bold border-b-4 ${activeColorClass} transition-all focus:outline-none whitespace-nowrap`;
+
+            // If switching to Pre chart, ensure it renders correctly
+            if(tabId === 'pre' && radarChart) {
+                radarChart.resize();
+            }
+        }
+
+
+        // --- 3. SOS Logic ---
+        function triggerSOS() {
+            const btn = document.getElementById('sos-btn');
+            const overlay = document.getElementById('sos-overlay');
+            const chatWindow = document.getElementById('chat-window');
+
+            // Button loading state
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 連線中...';
+            btn.classList.add('bg-red-700');
+
+            setTimeout(() => {
+                // Show Overlay
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                
+                // Add message to chat behind overlay
+                const mentorMsg = document.createElement('div');
+                mentorMsg.className = 'flex gap-2 animate-fade';
+                mentorMsg.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-white">M</div>
+                    <div class="bg-secondary text-white p-2 rounded-lg text-sm shadow-sm max-w-[80%]">
+                        <strong>Mentor:</strong> 收到！丈艾別怕，我們已經看到 AI 摘要了，馬上過去！
+                    </div>
+                `;
+                chatWindow.appendChild(mentorMsg);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+
+                // Reset button
+                btn.innerHTML = '<i class="fa-solid fa-bell"></i> 觸發 SOS 緊急求救';
+                btn.classList.remove('bg-red-700');
+            }, 1500);
+        }
+
+
+        // --- 4. Post-Service Logic ---
+        function showPostResult(type) {
+            const container = document.getElementById('post-result-container');
+            const placeholder = document.getElementById('post-placeholder');
+            
+            if(placeholder) placeholder.style.display = 'none';
+
+            if (type === 'rain') {
+                container.innerHTML = `
+                    <div class="text-center animate-fade w-full">
+                        <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                            <i class="fa-solid fa-tree"></i>
+                        </div>
+                        <h4 class="font-bold text-xl text-dark mb-2">樹洞修復機制</h4>
+                        <p class="text-sm text-gray-600 mb-4 px-4">
+                            沒關係的，我們都聽見了。<br>
+                            系統已為您開啟<span class="font-bold text-blue-600">私密回報通道</span>，<br>真人督導將在 24 小時內與您聯繫。
+                        </p>
+                        <button class="bg-blue-500 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-blue-600 transition">
+                            進入樹洞說話
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="text-center animate-fade w-full relative overflow-hidden h-full flex flex-col justify-center items-center">
+                        <div class="absolute top-0 right-0 m-2 text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded font-bold">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Generated
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4 text-left w-full max-w-sm">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs">A</div>
+                                <span class="font-bold text-sm text-dark">丈艾</span>
+                            </div>
+                            <p class="text-sm text-gray-700 mb-3">
+                                今天服務的爺爺原本一直不說話，直到我提到棒球...<br>
+                                原來，<span class="bg-yellow-200">被需要的感覺這麼好。</span>
+                                下次還要再來！ #智誠志工 #仁愛社區
+                            </p>
+                            <!-- 使用 Unsplash 圖片：手寫筆記或溫暖的照片 -->
+                            <div class="h-32 rounded-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1544027993-37dbfe43562a?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover opacity-80" alt="Hand holding a thank you note">
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-lg text-dark mb-2">魔法故事家</h4>
+                        <p class="text-sm text-gray-500 mb-4">Gemini 已將您的關鍵字生成為動人貼文！</p>
+                        <button class="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg hover:shadow-xl transition">
+                            一鍵分享擴散善意
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            initChart();
+        }
+
+    </script>
+</body>
+</html>
